@@ -12,5 +12,8 @@ script:
   - go test -v ./...
   - CGO_ENABLED=0 go build -o demo
   - docker build -t agrimmer/demo:latest ./
+  - GIT_SHA="$(git rev-parse --short HEAD)"
+  - docker tag agrimmer/demo:latest agrimmer/demo:$GIT_SHA
   - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
   - docker push agrimmer/demo:latest
+  - docker push agrimmer/demo:latest agrimmer/demo:$GIT_SHA
