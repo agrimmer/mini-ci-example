@@ -3,5 +3,12 @@ language: go
 go:
   - 1.13.x
 
-script: 
+services:
+  - docker
+
+script:   
   - go test -v ./...
+  - go build -o demo
+  - docker build -t agrimmer/demo:latest ./
+  - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
+  - docker push agrimmer/demo:latest
