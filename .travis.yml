@@ -16,4 +16,4 @@ script:
   - docker tag agrimmer/demo:latest agrimmer/demo:$GIT_SHA
   - echo "$REGISTRY_PASSWORD" | docker login --username $REGISTRY_USER --password-stdin
   - docker push agrimmer/demo:latest
-  - docker push agrimmer/demo:latest agrimmer/demo:$GIT_SHA
+  - docker push agrimmer/demo:$GIT_SHA
