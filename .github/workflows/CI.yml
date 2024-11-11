@@ -23,6 +23,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      # Boot Docker builder using by default the docker-container
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      # Login to DockerHub account
+      - name: Login to DockerHub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Start to test and build the artifact
@@ -32,3 +43,12 @@ jobs:
         run: |
           go test -v ./...
           CGO_ENABLED=0 GOARCH=amd64 go build -o demo
+
+      # Build a Docker image based on the provided Dockerfile
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: agrimmer/app:latest
