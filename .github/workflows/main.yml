@@ -44,6 +44,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Declare variables to store branch name and short Git commit SHA
+      - name: Declare variables
+        id: vars
+        shell: bash
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       # Build a Docker image based on the provided Dockerfile
       - name: Build and push
         id: docker_build
@@ -51,4 +58,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:${{ steps.vars.outputs.sha_short }}
