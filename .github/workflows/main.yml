@@ -37,3 +37,33 @@ jobs:
         run: |
           go test -v ./...
           CGO_ENABLED=0 GOARCH=amd64 go build -o demo
+
+      # Declare variables to store branch name and short Git commit SHA
+      - name: Declare variables
+        id: vars
+        shell: bash
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # Set up a Docker builder (the action uses the docker-container driver by default)
+      - name: Set up Docker Buildx
+        if: github.event_name != 'pull_request'
+        uses: docker/setup-buildx-action@v4
+      
+      # Login to DockerHub account
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # Build a Docker image using the local Dockerfile
+      - name: Build and push
+        id: docker_build
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:${{ steps.vars.outputs.sha_short }}
